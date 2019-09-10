@@ -52,18 +52,7 @@ RETURN r
 
 ### Jaccard
 
-```
-MATCH (k:Kanji {value: "家"})-[]->(n)
-WITH k, collect(id(n)) AS links
-
-MATCH (k2:Kanji)-[]->(n)
-WHERE k <> k2
-WITH k, links, k2, collect(id(n)) AS links2
-
-RETURN k.value, k2.value, algo.similarity.jaccard(links, links2) AS similarity
-ORDER BY similarity DESC
-LIMIT 10
-```
+Sample similarity (will not update the DB)
 
 ```
 MATCH (k:Kanji {value: "家"})-[]->(n)
@@ -77,6 +66,18 @@ RETURN k.value, k2.value, algo.similarity.jaccard(links, links2) AS similarity
 ORDER BY similarity DESC
 LIMIT 10
 ```
+
+Run the Jaccard algorithm (will udpate the DB)
+
+```
+MATCH (k:Kanji)-[]->(n)
+WITH {item: id(k), categories: collect(id(n))} AS userData
+WITH collect(userData) AS data
+CALL algo.similarity.jaccard(data, {topK: 3, similarityCutoff: 0.1, write:true, writeProperty: "jaccardSimilarity"})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty
+```
+
 
 ### PageRank
 
