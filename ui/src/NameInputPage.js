@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import "./App.css";
+import {withRouter} from "react-router-dom";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 
 class NameInputPage extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -15,12 +15,16 @@ class NameInputPage extends Component {
 
     handleChange(event) {
         this.setState({name: event.target.value});
-        console.log(this.state);
     }
+
     handleClick() {
-        this.props.history.push('/quiz')
+        console.log(this.state.name);
+        this.props.history.push({
+            pathname: "/quiz",
+            state: {name: this.state.name}
+        });
     }
-    
+
     render() {
         return (
             <Container className="h-100">
@@ -31,9 +35,9 @@ class NameInputPage extends Component {
                         </h1>
                         <Form className="text-center">
                             <Form.Group controlId="formBasicEmail">
-                                <Form.Control type="text" placeholder="name..." name="user-name"/>
+                                <Form.Control type="text" placeholder="name..." name="user-name" value={this.state.name} onChange={this.handleChange} />
                             </Form.Group>
-                            <Button variant="primary" type="submit" onClick={this.handleClick}>
+                            <Button variant="primary" type="button" onClick={this.handleClick}>
                                 Start!
                             </Button>
                         </Form>
@@ -44,4 +48,4 @@ class NameInputPage extends Component {
     }
 }
 
-export default NameInputPage;
+export default withRouter(NameInputPage);

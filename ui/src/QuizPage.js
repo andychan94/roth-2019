@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import "./App.css";
-import {Button, Col, Container, Form, Row} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 
 class QuizPage extends Component {
     render() {
+        console.log(this.props.location.state.name);
         return (
             <Container className="h-100">
                 <Row className="align-items-center h-100 justify-content-center">
@@ -11,7 +12,7 @@ class QuizPage extends Component {
                         <h1 className="text-light font-weight-bold text-center">
                             Fun字
                         </h1>
-                        <p>Quiz</p>
+                        <p className="text-light">Hello, {this.props.location.state.name}</p>
                     </Col>
                 </Row>
             </Container>
@@ -19,4 +20,4 @@ class QuizPage extends Component {
     }
 }
 
-export default NameInputPage;
+export default QuizPage;
