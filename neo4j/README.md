@@ -2,7 +2,7 @@
 
 ```
 UNWIND ["5", "4", "3", "2", "1"] AS level
-LOAD CSV FROM "https://github.com/andychan94/roth-2019/blob/master/neo4j/vocabulary_6501" + level + ".csv" AS row
+LOAD CSV FROM "https://raw.githubusercontent.com/andychan94/roth-2019/master/neo4j/data/vocabulary_6501" + level + ".csv" AS row
 MERGE (k:Kanji {value: row[0]})
 
 WITH row, k, level
