@@ -1,7 +1,6 @@
 import React from "react";
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-import "./UserList.css";
 import { withStyles } from "@material-ui/core/styles";
 import {
   Table,
@@ -48,7 +47,13 @@ class UserList extends React.Component {
 
     this.setState({ order, orderBy });
   };
-
+//   query{
+//   randomKanji(level:"N1"){
+//     value
+//     meanings(first:1){ value }
+//     notMeanings{value}
+//   }
+// }
   render() {
     const { order, orderBy } = this.state;
     return (
