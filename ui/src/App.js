@@ -1,26 +1,29 @@
 import React, { Component } from "react";
 import "./App.css";
-import Button from "bootstrap/js/src";
-import 
-import UserList from "./UserList";
+import {Button, Col, Container, Form, Row} from "react-bootstrap";
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img
-            src={process.env.PUBLIC_URL + "/img/grandstack.png"}
-            className="App-logo"
-            alt="logo"
-          />
-          <h1 className="App-title">Welcome to GRANDstack</h1>
-        </header>
-
-        <UserList />
-      </div>
-    );
-  }
+    render() {
+        return (
+            <Container>
+                <Row>
+                    <Col>
+                        <Form>
+                            <Form.Group controlId="formBasicEmail">
+                                <Form.Control type="name" placeholder="name..." />
+                                <Form.Text className="text-muted">
+                                    We'll never share your name with anyone else.
+                                </Form.Text>
+                            </Form.Group>
+                            <Button variant="primary" type="submit">
+                                Submit
+                            </Button>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
+        );
+    }
 }
 
 export default App;
