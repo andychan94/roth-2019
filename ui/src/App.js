@@ -5,18 +5,18 @@ import {Button, Col, Container, Form, Row} from "react-bootstrap";
 class App extends Component {
     render() {
         return (
-            <Container>
-                <Row>
-                    <Col>
-                        <Form>
+            <Container className="h-100">
+                <Row className="align-items-center h-100 justify-content-center">
+                    <Col md={6}>
+                        <h1 className="text-light font-weight-bold text-center">
+                            Fun字
+                        </h1>
+                        <Form className="text-center">
                             <Form.Group controlId="formBasicEmail">
                                 <Form.Control type="name" placeholder="name..." />
-                                <Form.Text className="text-muted">
-                                    We'll never share your name with anyone else.
-                                </Form.Text>
                             </Form.Group>
                             <Button variant="primary" type="submit">
-                                Submit
+                                Start!
                             </Button>
                         </Form>
                     </Col>
