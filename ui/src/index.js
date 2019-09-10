@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import App from "./App";
+import NameInputPage from "./NameInputPage";
 import registerServiceWorker from "./registerServiceWorker";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
@@ -12,7 +12,7 @@ const client = new ApolloClient({
 
 const Main = () => (
   <ApolloProvider client={client}>
-    <App />
+    <NameInputPage />
   </ApolloProvider>
 );
 
