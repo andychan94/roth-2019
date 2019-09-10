@@ -1,3 +1,25 @@
+type Kanji {
+  id: ID!
+  value: String
+  readings: [Reading] @relation(name: "HAS_READING", direction: "OUT")
+  meanings: [Meaning] @relation(name: "HAS_MEANING", direction: "OUT")
+
+  notMeanings: [Meaning]
+    @cypher(
+      statement: "MATCH (m:Meaning) WHERE NOT (this)-[:HAS_MEANING]-(m) WITH m, rand() AS rand RETURN m ORDER BY rand LIMIT 3"
+    )
+}
+
+type Reading {
+  id: ID!
+  value: String
+}
+
+type Meaning {
+  id: ID!
+  value: String
+}
+
 type User {
   id: ID!
   name: String
@@ -39,5 +61,10 @@ type Query {
   usersBySubstring(substring: String): [User]
     @cypher(
       statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u"
+    )
+
+  randomKanji(level: String): Kanji
+    @cypher(
+      statement: "MATCH (k:Kanji)-[:HAS_LEVEL]->(:Level {value: $level}) WITH k, rand() AS rand RETURN k ORDER BY rand LIMIT 1"
     )
 }
