@@ -32,11 +32,11 @@ class QuizPage extends Component {
       }
 
       //array.push({kanzi: data.randomKanji.meanings[0].value, correct: true})
-      array.push([data.randomKanji.notMeanings[0].value, false])
-      array.push([data.randomKanji.notMeanings[1].value, false])
-      array.push([data.randomKanji.notMeanings[2].value, false])
+      array.push([data.randomKanji.randomNotConnectedMeanings[0].value, false])
+      array.push([data.randomKanji.randomNotConnectedMeanings[1].value, false])
+      array.push([data.randomKanji.randomNotConnectedMeanings[2].value, false])
       let random = Math.floor( Math.random() * 4 );
-      array.splice(random, 0, [data.randomKanji.meanings[0].value, true])
+      array.splice(random, 0, [data.randomKanji.randomConnectedMeanings[0].value, true])
       // this.setState({quize: array});
       return array;
     }
@@ -56,8 +56,8 @@ class QuizPage extends Component {
             randomKanji(level: $level)
             {
                 value
-                meanings(first:1){value}
-                notMeanings{value}
+                randomConnectedMeanings(first:1){value}
+                randomNotConnectedMeanings(first:3){value}
             }
           }
         `}
