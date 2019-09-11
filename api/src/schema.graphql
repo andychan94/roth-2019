@@ -10,8 +10,9 @@ type Kanji {
       statement: """
         MATCH (this)-[:HAS_MEANING]->(m:Meaning)
         WITH m, rand() AS rand
-        RETURN m
+        WITH m
         ORDER BY rand
+        RETURN DISTINCT m
       """
     )
 
@@ -20,9 +21,10 @@ type Kanji {
       statement: """
         MATCH (this)-[:SIMILAR]-(:Kanji)-[:HAS_MEANING]->(m:Meaning)
         WHERE NOT (this)-[:HAS_MEANING]->(m)
-        WITH DISTINCT m, rand() AS rand
-        RETURN m
+        WITH m, rand() AS rand
+        WITH m
         ORDER BY rand
+        RETURN DISTINCT m
       """
     )
 
@@ -31,8 +33,9 @@ type Kanji {
       statement: """
         MATCH (this)-[:HAS_READING]->(r:Reading)
         WITH r, rand() AS rand
-        RETURN r
+        WITH r
         ORDER BY rand
+        RETURN DISTINCT r
       """
     )
 
@@ -41,9 +44,10 @@ type Kanji {
       statement: """
         MATCH (this)-[:SIMILAR]-(:Kanji)-[:HAS_READING]->(r:Reading)
         WHERE NOT (this)-[:HAS_READING]->(r)
-        WITH DISTINCT r, rand() AS rand
-        RETURN r
+        WITH r, rand() AS rand
+        WITH r
         ORDER BY rand
+        RETURN DISTINCT r
       """
     )
 }
@@ -65,8 +69,9 @@ type Reading {
       statement: """
         MATCH (this)<-[:HAS_READING]-(k:Kanji)
         WITH k, rand() AS rand
-        RETURN k
+        WITH k
         ORDER BY rand
+        RETURN DISTINCT k
       """
     )
 
@@ -75,9 +80,10 @@ type Reading {
       statement: """
         MATCH (this)<-[:HAS_READING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
         WHERE NOT (this)<-[:HAS_READNING]->(k)
-        WITH DISTINCT k, rand() AS rand
-        RETURN k
+        WITH k, rand() AS rand
+        WITH k
         ORDER BY rand
+        RETURN DISTINCT k
       """
     )
 }
@@ -99,8 +105,9 @@ type Meaning {
       statement: """
         MATCH (this)<-[:HAS_MEANING]-(k:Kanji)
         WITH k, rand() AS rand
-        RETURN k
+        WITH k
         ORDER BY rand
+        RETURN DISTINCT k
       """
     )
 
@@ -109,9 +116,10 @@ type Meaning {
       statement: """
         MATCH (this)<-[:HAS_MEANING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
         WHERE NOT (this)<-[:HAS_MEANING]->(k)
-        WITH DISTINCT k, rand() AS rand
-        RETURN k
+        WITH k, rand() AS rand
+        WITH k
         ORDER BY rand
+        RETURN DISTINCT k
       """
     )
 }
