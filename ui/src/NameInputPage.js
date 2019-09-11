@@ -1,27 +1,51 @@
 import React, {Component} from "react";
 import "./App.css";
-import {withRouter} from "react-router-dom";
+// import {withRouter} from "react-router-dom";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
+import gql from "graphql-tag";
+import { compose, graphql } from 'react-apollo'
+
+const REGISTER_USER = gql`
+mutation User($userName: String!, $userScore: Int) {
+  CreateUser(name: $userName, score: $userScore) {
+    id
+    score
+  }
+}`;
 
 class NameInputPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: ""
+            userName: "",
+            userId: "",
+            userScore: 0
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleChange(event) {
-        this.setState({name: event.target.value});
+        this.setState({userName: event.target.value});
     }
-
+    async regUser(name) {
+        const { CreateUser } = this.props;
+        const result = await CreateUser({ variables: {
+            'userName': name,
+            'userScore': 0
+        } });
+        this.setState({userId: result.data.CreateUser.id});
+        this.setState({userScore: result.data.CreateUser.score});
+        this.handleClick();
+    }
     handleClick() {
-        console.log(this.state.name);
         this.props.history.push({
             pathname: "/quiz",
-            state: {name: this.state.name}
+            state: {
+                userName: this.state.userName,
+                userId: this.state.userId,
+                userScore: this.state.userScore,
+            }
         });
     }
 
@@ -35,9 +59,9 @@ class NameInputPage extends Component {
                         </h1>
                         <Form className="text-center">
                             <Form.Group controlId="formBasicEmail">
-                                <Form.Control type="text" placeholder="name..." name="user-name" value={this.state.name} onChange={this.handleChange} />
+                                <Form.Control type="text" placeholder="name..." value={this.state.userName} onChange={this.handleChange} />
                             </Form.Group>
-                            <Button variant="primary" type="button" onClick={this.handleClick}>
+                            <Button variant="primary" type="button" onClick={this.regUser.bind(this,this.state.userName)}>
                                 Start!
                             </Button>
                         </Form>
@@ -48,4 +72,6 @@ class NameInputPage extends Component {
     }
 }
 
-export default withRouter(NameInputPage);
+export default compose(
+    graphql(REGISTER_USER, { name: 'CreateUser' })
+)(NameInputPage);

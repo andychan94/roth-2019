@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import "./App.css";
-import {Button, Col, Container, Row} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 import ButtonComponent from "./ButtonComponent";
 import QuestionComponent from "./QuestionComponent";
 import gql from "graphql-tag";
@@ -11,7 +11,7 @@ class QuizPage extends Component {
         super(props);
         this.array = [];
         this.state = {
-            currentLevel: "N5",
+            currentLevel: "N1",
             isAnswered: false,
             data: null,
             quize: null,
@@ -74,6 +74,11 @@ class QuizPage extends Component {
                                     <h1 className="text-light font-weight-bold text-center">
                                         Fun字
                                     </h1>
+                                    <h4>
+                                        Hello, {this.props.location.state.userName}.<br />
+                                        Your id is {this.props.location.state.userId}<br />
+                                        Your score: {this.props.location.state.userScore}
+                                    </h4>
                                     <p className="text-light">What is the meaning of this
                                         kanji: {data.randomKanji.value}?</p>
                                     {this.array = this.shuffleQuize(data)}
