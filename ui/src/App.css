@@ -21,6 +21,27 @@
   font-size: large;
 }
 
-.btn .focus, .btn:focus {
+.funji-answer:focus {
   box-shadow: 0 0 0 0.4rem rgba(255,255,255,1);
+}
+#root > div {
+  height: 100% !important;
+}
+.funji-answer {
+  /*padding: 10px 0 !important;*/
+  /*color: #fff;*/
+}
+.kanji {
+  font-family: "Sawarabi Mincho", "Sawarabi Mincho", cursive;
+}
+.logo {
+  height:30px;
+  width:auto;
+}
+.logo-line {
+  height: 80px;
+  line-height: 80px;
+}
+.btn {
+  cursor: pointer !important;
 }

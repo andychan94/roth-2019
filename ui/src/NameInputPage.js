@@ -3,7 +3,7 @@ import "./App.css";
 // import {withRouter} from "react-router-dom";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import gql from "graphql-tag";
-import { compose, graphql } from 'react-apollo'
+import {compose, graphql} from 'react-apollo'
 
 const REGISTER_USER = gql`
 mutation User($userName: String!, $userScore: Int) {
@@ -28,16 +28,20 @@ class NameInputPage extends Component {
     handleChange(event) {
         this.setState({userName: event.target.value});
     }
+
     async regUser(name) {
-        const { CreateUser } = this.props;
-        const result = await CreateUser({ variables: {
-            'userName': name,
-            'userScore': 0
-        } });
+        const {CreateUser} = this.props;
+        const result = await CreateUser({
+            variables: {
+                'userName': name,
+                'userScore': 0
+            }
+        });
         this.setState({userId: result.data.CreateUser.id});
         this.setState({userScore: result.data.CreateUser.score});
         this.handleClick();
     }
+
     handleClick() {
         this.props.history.push({
             pathname: "/quiz",
@@ -51,27 +55,31 @@ class NameInputPage extends Component {
 
     render() {
         return (
-            <Container className="h-100">
-                <Row className="align-items-center h-100 justify-content-center">
-                    <Col md={6}>
-                        <h1 className="text-light font-weight-bold text-center">
-                            Fun字
-                        </h1>
-                        <Form className="text-center">
-                            <Form.Group controlId="formBasicEmail">
-                                <Form.Control type="text" placeholder="name..." value={this.state.userName} onChange={this.handleChange} />
-                            </Form.Group>
-                            <Button variant="primary" type="button" onClick={this.regUser.bind(this,this.state.userName)}>
+            <>
+                <h1 className="text-light font-weight-bold align-middle logo-line text-center mb-5">
+                    &#x1F344;
+                    Fun<span className="kanji">字</span>
+                </h1>
+                <Container>
+                    <Row>
+                        <Col md={6} className="text-center">
+                            <Form.Control type="text" placeholder="your name..." value={this.state.userName}
+                                          onChange={this.handleChange} className="mb-2"/>
+                            <Button variant="danger" type="button"
+                                    onClick={this.regUser.bind(this, this.state.userName)}
+                                    onTouch={this.regUser.bind(this, this.state.userName)}
+                                disabled={this.state.userName === ""}
+                            >
                                 Start!
                             </Button>
-                        </Form>
-                    </Col>
-                </Row>
-            </Container>
+                        </Col>
+                    </Row>
+                </Container>
+            </>
         );
     }
 }
 
 export default compose(
-    graphql(REGISTER_USER, { name: 'CreateUser' })
+    graphql(REGISTER_USER, {name: 'CreateUser'})
 )(NameInputPage);
