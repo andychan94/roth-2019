@@ -1,9 +1,8 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import "./App.css";
-// import {withRouter} from "react-router-dom";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import gql from "graphql-tag";
-import { compose, graphql } from "react-apollo";
+import {compose, graphql} from "react-apollo";
 
 const REGISTER_USER = gql`
   mutation User($userName: String!, $userScore: Int) {
@@ -27,19 +26,19 @@ class NameInputPage extends Component {
   }
 
   handleChange(event) {
-    this.setState({ userName: event.target.value });
+    this.setState({userName: event.target.value});
   }
 
   async regUser(name) {
-    const { CreateUser } = this.props;
+    const {CreateUser} = this.props;
     const result = await CreateUser({
       variables: {
         userName: name,
         userScore: 0
       }
     });
-    this.setState({ userId: result.data.CreateUser.id });
-    this.setState({ userScore: result.data.CreateUser.score });
+    this.setState({userId: result.data.CreateUser.id});
+    this.setState({userScore: result.data.CreateUser.score});
     this.handleClick();
   }
 
@@ -87,6 +86,6 @@ class NameInputPage extends Component {
   }
 }
 
-export default compose(graphql(REGISTER_USER, { name: "CreateUser" }))(
+export default compose(graphql(REGISTER_USER, {name: "CreateUser"}))(
   NameInputPage
 );
