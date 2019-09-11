@@ -50,6 +50,27 @@ type Kanji {
 type Reading {
   id: ID!
   value: String
+
+  randomConnectedKanjis: [Kanji]
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_READING]-(k:Kanji)
+        WITH k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedKanjis: [Kanji]
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_READING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
+        WHERE NOT (this)<-[:HAS_READNING]->(k)
+        WITH DISTINCT k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+      """
+    )
 }
 
 type Meaning {
@@ -71,8 +92,8 @@ type Meaning {
       statement: """
         MATCH (this)<-[:HAS_MEANING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
         WHERE NOT (this)<-[:HAS_MEANING]->(k)
-        WITH DISTINCT k AS kanji, rand() AS rand
-        RETURN kanji
+        WITH DISTINCT k, rand() AS rand
+        RETURN k
         ORDER BY rand
       """
     )
@@ -102,6 +123,17 @@ type Query {
         MATCH (m:Meaning)<-[:HAS_MEANING]-(:Kanji)-[:HAS_LEVEL]->(:Level {value: $level})
         WITH m, rand() AS rand
         RETURN m
+        ORDER BY rand
+        LIMIT 1
+      """
+    )
+
+  randomReading(level: String): Reading
+    @cypher(
+      statement: """
+        MATCH (r:Reading)<-[:HAS_READING]-(:Kanji)-[:HAS_LEVEL]->(:Level {value: $level})
+        WITH r, rand() AS rand
+        RETURN r
         ORDER BY rand
         LIMIT 1
       """
