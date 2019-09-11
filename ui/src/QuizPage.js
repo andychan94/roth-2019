@@ -7,15 +7,11 @@ import gql from "graphql-tag";
 class QuizPage extends Component {
   constructor(props) {
     super(props);
-    this.array = [];
     this.state = {
       currentLevel: "N5",
-      isAnswered: false,
-      data: null,
-      quize: null,
-      isClicked: false,
       score: 0,
-      streak: 0
+      streak: 0,
+      questionsCount: 0
     };
   }
 
@@ -26,12 +22,12 @@ class QuizPage extends Component {
         var newScore = this.state.score + (isCorrect ? points : 0)
         var newStreak = this.state.streak + (isCorrect ? 1 : -1)
         var newLevel = this.state.currentLevel
-        
-        if (newStreak == 2) {
+
+        if (newStreak == 3) {
             newStreak = 0
             newLevel = this.changeLevel(newLevel, 1)
         }
-        else if (newStreak == -2) {
+        else if (newStreak == -3) {
             newStreak = 0
             newLevel = this.changeLevel(newLevel, -1)
         } 
@@ -57,7 +53,8 @@ class QuizPage extends Component {
         this.setState({
             score: newScore,
             streak: newStreak,
-            currentLevel: newLevel
+            currentLevel: newLevel,
+            questionsCount: this.state.questionsCount + 1
         })
 
     console.log("updateScore", newScore, newStreak, newLevel);
@@ -84,26 +81,42 @@ class QuizPage extends Component {
   }
 
   render() {
-    return (
-      <>
-        <h1 className="text-light font-weight-bold align-middle logo-line text-center mb-3">
-          &#x1F344; Fun<span className="kanji">字</span>
-        </h1>
-        <Container>
-          <h5 className="text-center mb-5">
-            {this.props.location.state.userName}: {this.state.score} points
-          </h5>
-          <Row className="align-items-center">
-            <Col md={6}>
-              <QuestionComponent
-                updateScore={this.updateScore}
-                level={this.state.currentLevel}
-              />
-            </Col>
-          </Row>
-        </Container>
-      </>
-    );
+    if (this.state.questionsCount == 20) {
+        return (
+            <>
+              <h1 className="text-light font-weight-bold align-middle logo-line text-center mb-3">
+                    &#x1F344; Fun<span className="kanji">字</span>
+                </h1>
+                <h5 className="text-center mb-5">
+                    Hey {this.props.location.state.userName}, you got <strong>{this.state.score}</strong> points!
+                </h5>
+                <div className="text-center mb-5">You should try to take the JLPT {this.state.currentLevel}!!</div>
+            </>
+        )
+    }
+    else {
+        return (
+        <>
+            <h1 className="text-light font-weight-bold align-middle logo-line text-center mb-3">
+            &#x1F344; Fun<span className="kanji">字</span>
+            </h1>
+            <Container>
+            <h5 className="text-center mb-5">
+                {this.props.location.state.userName}: {this.state.score} points
+            </h5>
+            
+            <Row className="align-items-center justify-content-center">
+                <Col md={6}>
+                <QuestionComponent
+                    updateScore={this.updateScore}
+                    level={this.state.currentLevel}
+                />
+                </Col>
+            </Row>
+            </Container>
+        </>
+        )
+    }
   }
 }
 

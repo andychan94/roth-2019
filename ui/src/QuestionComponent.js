@@ -133,7 +133,10 @@ export default class QuestionComponent extends Component {
             return (
                 <ApolloConsumer>
                     {client => (
-                        <button onClick={this.query.bind(this, client)}>Click to start!</button>
+                        <Button block 
+                                variant="danger"
+                                className="btn-lg"
+                                onClick={this.query.bind(this, client)}>Click to start!</Button>
                     )}
                 </ApolloConsumer>
             )
