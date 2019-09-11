@@ -71,22 +71,7 @@ class QuizPage extends Component {
                         <Container className="h-100">
                             <Row className="align-items-center h-100 justify-content-center">
                                 <Col md={6}>
-                                    <h1 className="text-light font-weight-bold text-center">
-                                        Fun字
-                                    </h1>
-                                    <h4>
-                                        Hello, {this.props.location.state.userName}.<br />
-                                        Your id is {this.props.location.state.userId}<br />
-                                        Your score: {this.props.location.state.userScore}
-                                    </h4>
-                                    <p className="text-light">What is the meaning of this
-                                        kanji: {data.randomKanji.value}?</p>
-                                    {this.array = this.shuffleQuize(data)}
-                                    {console.log(array)}
-                                    {this.renderButton(this.array[0][0], this.array[0][1])}
-                                    {this.renderButton(this.array[1][0], this.array[1][1])}
-                                    {this.renderButton(this.array[2][0], this.array[2][1])}
-                                    {this.renderButton(this.array[3][0], this.array[3][1])}
+                                <QuestionComponent></QuestionComponent>
                                 </Col>
                             </Row>
                         </Container>

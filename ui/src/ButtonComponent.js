@@ -10,7 +10,7 @@ export default class ButtonComponent extends Component {
         return (
             <Button block
                     variant={this.props.isAnswered ? (this.props.isCorrect ? "success" : "danger") : "outline-secondary"}
-                    onClick={this.handleClick}>
+                    >
                 {this.props.text}
             </Button>
         );
