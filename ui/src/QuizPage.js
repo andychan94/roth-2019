@@ -8,20 +8,27 @@ import {Query} from "react-apollo";
 class QuizPage extends Component {
     constructor(props) {
         super(props);
+        this.array = [];
         this.state = {
             currentLevel: "N5",
             isAnswered: false,
             data: null,
-            quize: null
+            quize: null,
+            isClicked: false
         }
     }
 
     handleClick = () => {
         this.setState({isAnswered: true});
+        this.setState({isClicked: true});
     };
 
     shuffleQuize(data) {
       let array = [];
+      if(this.state.isClicked === true) {
+        return this.array;
+      }
+
       //array.push({kanzi: data.randomKanji.meanings[0].value, correct: true})
       array.push([data.randomKanji.notMeanings[0].value, false])
       array.push([data.randomKanji.notMeanings[1].value, false])
@@ -67,12 +74,12 @@ class QuizPage extends Component {
                                     </h1>
                                     <p className="text-light">What is the meaning of this
                                         kanji: {data.randomKanji.value}?</p>
-                                    {array = this.shuffleQuize(data)}
+                                    {this.array = this.shuffleQuize(data)}
                                     {console.log(array)}
-                                    {this.renderButton(array[0][0], array[0][1])}
-                                    {this.renderButton(array[1][0], array[1][1])}
-                                    {this.renderButton(array[2][0], array[2][1])}
-                                    {this.renderButton(array[3][0], array[3][1])}
+                                    {this.renderButton(this.array[0][0], this.array[0][1])}
+                                    {this.renderButton(this.array[1][0], this.array[1][1])}
+                                    {this.renderButton(this.array[2][0], this.array[2][1])}
+                                    {this.renderButton(this.array[3][0], this.array[3][1])}
                                 </Col>
                             </Row>
                         </Container>
