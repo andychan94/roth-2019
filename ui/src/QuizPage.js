@@ -11,7 +11,8 @@ class QuizPage extends Component {
         this.state = {
             currentLevel: "N5",
             isAnswered: false,
-            data: null
+            data: null,
+            quize: null
         }
     }
 
@@ -19,17 +20,29 @@ class QuizPage extends Component {
         this.setState({isAnswered: true});
     };
 
+    shuffleQuize(data) {
+      let array = [];
+      //array.push({kanzi: data.randomKanji.meanings[0].value, correct: true})
+      array.push([data.randomKanji.notMeanings[0].value, false])
+      array.push([data.randomKanji.notMeanings[1].value, false])
+      array.push([data.randomKanji.notMeanings[2].value, false])
+      let random = Math.floor( Math.random() * 4 );
+      array.splice(random, 0, [data.randomKanji.meanings[0].value, true])
+      // this.setState({quize: array});
+      return array;
+    }
+
     renderButton(text, isCorrect) {
         return <ButtonComponent text={text} isCorrect={isCorrect} isAnswered={this.state.isAnswered}
                                 onClick={this.handleClick}/>
     }
 
     render() {
-        // Hello, {this.props.location.state.name}
+        let array;
         return (
             <Query
                 query={gql`
-          query Kanji($level: String!) 
+          query Kanji($level: String!)
           {
             randomKanji(level: $level)
             {
@@ -54,10 +67,12 @@ class QuizPage extends Component {
                                     </h1>
                                     <p className="text-light">What is the meaning of this
                                         kanji: {data.randomKanji.value}?</p>
-                                    {this.renderButton(data.randomKanji.meanings[0].value, true)}
-                                    {this.renderButton(data.randomKanji.notMeanings[0].value, false)}
-                                    {this.renderButton(data.randomKanji.notMeanings[1].value, false)}
-                                    {this.renderButton(data.randomKanji.notMeanings[2].value, false)}
+                                    {array = this.shuffleQuize(data)}
+                                    {console.log(array)}
+                                    {this.renderButton(array[0][0], array[0][1])}
+                                    {this.renderButton(array[1][0], array[1][1])}
+                                    {this.renderButton(array[2][0], array[2][1])}
+                                    {this.renderButton(array[3][0], array[3][1])}
                                 </Col>
                             </Row>
                         </Container>
