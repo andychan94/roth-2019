@@ -1,6 +1,7 @@
 type Kanji {
   id: ID!
   value: String
+  score: Int
   readings: [Reading] @relation(name: "HAS_READING", direction: "OUT")
   meanings: [Meaning] @relation(name: "HAS_MEANING", direction: "OUT")
 
@@ -51,6 +52,14 @@ type Reading {
   id: ID!
   value: String
 
+  score: Int
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_READING]-(k:Kanji)
+        RETURN round(avg(k.score))
+      """
+    )
+
   randomConnectedKanjis: [Kanji]
     @cypher(
       statement: """
@@ -76,6 +85,14 @@ type Reading {
 type Meaning {
   id: ID!
   value: String
+
+  score: Int
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_MEANING]-(k:Kanji)
+        RETURN round(avg(k.score))
+      """
+    )
 
   randomConnectedKanjis: [Kanji]
     @cypher(

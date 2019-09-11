@@ -78,11 +78,11 @@ YIELD nodes, iterations, loadMillis, computeMillis, writeMillis, dampingFactor, 
 RETURN nodes, iterations, loadMillis, computeMillis, writeMillis, dampingFactor, write, writeProperty
 ```
 
-We update the pagerank score to be funnier.
+We add a score property defined as pagerank value x 100.
 
 ```
 MATCH (k:Kanji)
-SET k.pagerank = round(k.pagerank * 100)
+SET k.score = round(k.pagerank * 100)
 ```
 
 Finally, we clea the SIMILAR relationships.
