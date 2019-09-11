@@ -4,13 +4,44 @@ type Kanji {
   readings: [Reading] @relation(name: "HAS_READING", direction: "OUT")
   meanings: [Meaning] @relation(name: "HAS_MEANING", direction: "OUT")
 
-  notMeanings: [Meaning]
+  randomConnectedMeanings: [Meaning]
     @cypher(
       statement: """
-        MATCH (this)-[:SIMILAR]-(k2:Kanji)-[:HAS_MEANING]->(m2:Meaning)
-        WHERE NOT (this)-[:HAS_MEANING]->(m2)
-        WITH DISTINCT m2 AS meaning, rand() AS rand
-        RETURN meaning
+        MATCH (this)-[:HAS_MEANING]->(m:Meaning)
+        WITH m, rand() AS rand
+        RETURN m
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedMeanings: [Meaning]
+    @cypher(
+      statement: """
+        MATCH (this)-[:SIMILAR]-(:Kanji)-[:HAS_MEANING]->(m:Meaning)
+        WHERE NOT (this)-[:HAS_MEANING]->(m)
+        WITH DISTINCT m, rand() AS rand
+        RETURN m
+        ORDER BY rand
+      """
+    )
+
+    randomConnectedReadings: [Reading]
+    @cypher(
+      statement: """
+        MATCH (this)-[:HAS_READING]->(r:Reading)
+        WITH r, rand() AS rand
+        RETURN r
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedReadings: [Reading]
+    @cypher(
+      statement: """
+        MATCH (this)-[:SIMILAR]-(:Kanji)-[:HAS_READING]->(r:Reading)
+        WHERE NOT (this)-[:HAS_READING]->(r)
+        WITH DISTINCT r, rand() AS rand
+        RETURN r
         ORDER BY rand
       """
     )
@@ -65,7 +96,7 @@ type Query {
       """
     )
 
-  randomMeaning(level: String): Kanji
+  randomMeaning(level: String): Meaning
     @cypher(
       statement: """
         MATCH (m:Meaning)<-[:HAS_MEANING]-(:Kanji)-[:HAS_LEVEL]->(:Level {value: $level})
