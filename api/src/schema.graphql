@@ -102,6 +102,7 @@ type Meaning {
 type User {
   id: ID!
   name: String!
+  score: Int
 }
 
 
