@@ -34,8 +34,8 @@ class QuizPage extends Component {
             randomKanji(level: $level)
             {
                 value
-                meanings(first:1){value}
-                notMeanings{value}
+                randomConnectedMeanings(first:1){value}
+                randomNotConnectedMeanings{value}
             }
           }
         `}
@@ -53,15 +53,17 @@ class QuizPage extends Component {
                                         Fun字
                                     </h1>
                                     <h4>
-                                        Hello, {this.props.location.state.userName}. Your id is {this.props.location.state.userId}
+                                        Hello, {this.props.location.state.userName}.<br />
+                                        Your id is {this.props.location.state.userId}<br />
+                                        Your score: {this.props.location.state.userScore}
                                     </h4>
                                     <p className="text-light">What is the meaning of this
                                         kanji: {data.randomKanji.value}?</p>
                                     <div className="answers">
-                                        {this.renderButton(data.randomKanji.meanings[0].value, true)}
-                                        {this.renderButton(data.randomKanji.notMeanings[0].value, false)}
-                                        {this.renderButton(data.randomKanji.notMeanings[1].value, false)}
-                                        {this.renderButton(data.randomKanji.notMeanings[2].value, false)}
+                                        {this.renderButton(data.randomKanji.randomConnectedMeanings[0].value, true)}
+                                        {this.renderButton(data.randomKanji.randomNotConnectedMeanings[0].value, false)}
+                                        {this.renderButton(data.randomKanji.randomNotConnectedMeanings[1].value, false)}
+                                        {this.renderButton(data.randomKanji.randomNotConnectedMeanings[2].value, false)}
                                     </div>
                                 </Col>
                             </Row>

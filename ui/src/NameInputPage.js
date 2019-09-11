@@ -6,9 +6,10 @@ import gql from "graphql-tag";
 import { compose, graphql } from 'react-apollo'
 
 const REGISTER_USER = gql`
-mutation User($userName: String!) {
-  CreateUser(name: $userName) {
+mutation User($userName: String!, $userScore: Int) {
+  CreateUser(name: $userName, score: $userScore) {
     id
+    score
   }
 }`;
 
@@ -17,7 +18,8 @@ class NameInputPage extends Component {
         super(props);
         this.state = {
             userName: "",
-            userId: ""
+            userId: "",
+            userScore: 0
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -28,8 +30,12 @@ class NameInputPage extends Component {
     }
     async regUser(name) {
         const { CreateUser } = this.props;
-        const result = await CreateUser({ variables: { 'userName': name } });
+        const result = await CreateUser({ variables: {
+            'userName': name,
+            'userScore': 0
+        } });
         this.setState({userId: result.data.CreateUser.id});
+        this.setState({userScore: result.data.CreateUser.score});
         this.handleClick();
     }
     handleClick() {
@@ -38,6 +44,7 @@ class NameInputPage extends Component {
             state: {
                 userName: this.state.userName,
                 userId: this.state.userId,
+                userScore: this.state.userScore,
             }
         });
     }
