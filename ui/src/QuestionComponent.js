@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import gql from "graphql-tag";
-import {Query} from "react-apollo";
+import {Query, ApolloConsumer} from "react-apollo";
 import {Button} from "react-bootstrap";
 
 const QUESTIONS_TYPES = [
@@ -65,8 +65,10 @@ export default class QuestionComponent extends Component {
         this.state = {
             isAnswered: false,
             choices: [],
-            question: this.chooseRandomQuestion(),
-            score: 0
+            score: 0,
+            data: null,
+            label: null,
+            question: null,
         }
     }
 
@@ -74,77 +76,90 @@ export default class QuestionComponent extends Component {
         return QUESTIONS_TYPES[Math.floor(Math.random() * QUESTIONS_TYPES.length)];
     }
 
-    handleClick(choice, refetch) {
+    handleClick(choice, client) {
+        if (this.state.isAnswered) {
+            return
+        }
+
         this.setState({isAnswered: true});
 
         var isCorrectAnswer = this.state.choices[choice][1];
 
-        this.props.updateScore(isCorrectAnswer, this.state.score);
+        this.props.updateScore(isCorrectAnswer, this.state.score, client);
 
         var isCorrectAnswer = this.state.choices[choice][1]
  
         this.props.updateScore(isCorrectAnswer, this.state.score)
 
         setTimeout(() => {
-            refetch();
-
-            this.setState({
-                isAnswered: false,
-                choices: [],
-                question: this.chooseRandomQuestion(),
-                score: 0
-            })
+            this.query(client)
         }, 1000)
     }
 
+    async query(client) {
+        var question = this.chooseRandomQuestion()
+
+        const { data } = await client.query({
+            query: question.query,
+            variables: { level: this.props.level },
+            fetchPolicy: "network-only"
+        })
+
+        if (data.question.wrongOptions.length < 3) {
+            return this.query(client)
+        }
+
+        var choices = [];
+        choices.push([data.question.wrongOptions[0].value, false]);
+        choices.push([data.question.wrongOptions[1].value, false]);
+        choices.push([data.question.wrongOptions[2].value, false]);
+        choices.splice(
+            Math.floor(Math.random() * 4),
+            0,
+            [data.question.correctOptions[0].value, true]
+        );
+
+        this.setState({
+            isAnswered: false,
+            label: question.label,
+            question: data.question.value,
+            score: data.question.score,
+            choices: choices
+        })
+    }
+
     render() {
-        return (
-            <Query query={this.state.question.query} variables={{level: this.props.level}}>
-                {({ loading, error, data, refetch }) => {
-                    if (loading) return "Loading..."
-                    if (error) return `Error! ${error.message}`
-
-                    if (this.state.choices.length === 0) {
-                        if (data.question.wrongOptions.length !== 3) {
-                            refetch();
-                            return null
-                        }
-
-                        var choices = [];
-                        choices.push([data.question.wrongOptions[0].value, false]);
-                        choices.push([data.question.wrongOptions[1].value, false]);
-                        choices.push([data.question.wrongOptions[2].value, false]);
-                        choices.splice(
-                            Math.floor(Math.random() * 4),
-                            0,
-                            [data.question.correctOptions[0].value, true]
-                        );
-
-                        this.setState({
-                            choices: choices,
-                            score: data.question.score
-                        })
-                    }
-
-                    return (
+        if (!this.state.question) {
+            return (
+                <ApolloConsumer>
+                    {client => (
+                        <button onClick={this.query.bind(this, client)}>Click to start!</button>
+                    )}
+                </ApolloConsumer>
+            )
+        }
+        else {
+            return (
+                <ApolloConsumer>
+                    {client => (
                         <div>
                             <div className="text-center">
-                                <h5 className="text-light">{this.state.question.label}</h5>
-                                <h1 className="kanji">{data.question.value}</h1>
+                                <h5 className="text-light">{this.state.label}</h5>
+                                <h1 className="kanji">{this.state.question}</h1>
                             </div>
 
                             {this.state.choices.map((choice, i) => (
                                 <Button block
                                         variant={this.state.isAnswered ? (choice[1] ? "success" : "danger") : "info"}
                                         className="funji-answer mb-4 btn-lg"
-                                        onClick={this.handleClick.bind(this, i, refetch)}>
+                                        onClick={this.handleClick.bind(this, i, client)}>
                                     {choice[0]}
                                 </Button>
                             ))}
                         </div>
-                    )
-                }}
-            </Query>
-        )
+                    )}
+                </ApolloConsumer>
+            )
+        }
     }
 }

@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import "./App.css";
 import {Col, Container, Row} from "react-bootstrap";
 import QuestionComponent from "./QuestionComponent";
+import gql from "graphql-tag";
 
 class QuizPage extends Component {
     constructor(props) {
@@ -18,7 +19,10 @@ class QuizPage extends Component {
         }
     }
 
-    updateScore = (isCorrect, points) => {
+    updateScore = async (isCorrect, points, client) => {
+        if (!client)
+            return
+
         var newScore = this.state.score + (isCorrect ? points : 0)
         var newStreak = this.state.streak + (isCorrect ? 1 : -1)
         var newLevel = this.state.currentLevel
@@ -31,6 +35,24 @@ class QuizPage extends Component {
             newStreak = 0
             newLevel = this.changeLevel(newLevel, -1)
         } 
+
+        var userId = this.props.location.state.userId
+
+        const { data } = await client.mutate({
+            mutation: gql`
+                mutation User($userId: ID!, $userScore: Int) {
+                UpdateUser(id: $userId, score: $userScore) {
+                    score
+                }
+                }
+            `,
+            variables: {
+                userId: userId,
+                userScore: newScore
+            }
+        })
+
+        console.log(data)
 
         console.log("updateScore", newScore, newStreak, newLevel)
         
