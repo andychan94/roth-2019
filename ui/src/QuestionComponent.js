@@ -10,6 +10,7 @@ const QUESTIONS_TYPES = [
             query Kanji($level: String!) {
                 question: randomKanji(level: $level) {
                     value
+                    score
                     correctOptions: randomConnectedMeanings(first:1) { value }
                     wrongOptions: randomNotConnectedMeanings(first:3) { value }
                 }
@@ -22,6 +23,7 @@ const QUESTIONS_TYPES = [
             query Kanji($level: String!) {
                 question: randomKanji(level: $level) {
                     value
+                    score
                     correctOptions: randomConnectedReadings(first:1) { value }
                     wrongOptions: randomNotConnectedReadings(first:3) { value }
                 }
@@ -34,6 +36,7 @@ const QUESTIONS_TYPES = [
             query Meaning($level: String!) {
                 question: randomMeaning(level: $level) {
                     value
+                    score
                     correctOptions: randomConnectedKanjis(first:1) { value }
                     wrongOptions: randomNotConnectedKanjis(first:3) { value }
                 }
@@ -46,6 +49,7 @@ const QUESTIONS_TYPES = [
             query Reading($level: String!) {
                 question: randomReading(level: $level) {
                     value
+                    score
                     correctOptions: randomConnectedKanjis(first:1) { value }
                     wrongOptions: randomNotConnectedKanjis(first:3) { value }
                 }
@@ -61,7 +65,8 @@ export default class QuestionComponent extends Component {
         this.state = {
             isAnswered: false,
             choices: [],
-            question: this.chooseRandomQuestion()
+            question: this.chooseRandomQuestion(),
+            score: 0
         }
     }
 
@@ -69,8 +74,12 @@ export default class QuestionComponent extends Component {
         return QUESTIONS_TYPES[Math.floor(Math.random() * QUESTIONS_TYPES.length)];
     }
 
-    handleClick(refetch) {
+    handleClick(choice, refetch) {
         this.setState({ isAnswered: true })
+
+        var isCorrectAnswer = this.state.choices[choice][1]
+ 
+        this.props.updateScore(isCorrectAnswer, this.state.score)
 
         setTimeout(() => {
             refetch()
@@ -78,7 +87,8 @@ export default class QuestionComponent extends Component {
             this.setState({
                 isAnswered: false,
                 choices: [],
-                question: this.chooseRandomQuestion()
+                question: this.chooseRandomQuestion(),
+                score: 0
             })
         }, 1000)
     }
@@ -107,7 +117,8 @@ export default class QuestionComponent extends Component {
                         )
 
                         this.setState({
-                            choices: choices
+                            choices: choices,
+                            score: data.question.score
                         })
                     }
 
@@ -117,10 +128,9 @@ export default class QuestionComponent extends Component {
                             <div>{data.question.value}</div>
 
                             {this.state.choices.map((choice, i) => (
-                                <Button
-                                        block
+                                <Button block
                                         variant={this.state.isAnswered ? (choice[1] ? "success" : "danger") : "outline-secondary"}
-                                        onClick={this.handleClick.bind(this, refetch)}>
+                                        onClick={this.handleClick.bind(this, i, refetch)}>
                                     {choice[0]}
                                 </Button>
                             ))}

@@ -79,7 +79,7 @@ type Reading {
     @cypher(
       statement: """
         MATCH (this)<-[:HAS_READING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
-        WHERE NOT (this)<-[:HAS_READNING]->(k)
+        WHERE NOT (this)<-[:HAS_READING]->(k)
         WITH k, rand() AS rand
         WITH k
         ORDER BY rand
