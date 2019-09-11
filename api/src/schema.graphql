@@ -4,20 +4,99 @@ type Kanji {
   readings: [Reading] @relation(name: "HAS_READING", direction: "OUT")
   meanings: [Meaning] @relation(name: "HAS_MEANING", direction: "OUT")
 
-  notMeanings: [Meaning]
+  randomConnectedMeanings: [Meaning]
     @cypher(
-      statement: "MATCH (m:Meaning) WHERE NOT (this)-[:HAS_MEANING]-(m) WITH m, rand() AS rand RETURN m ORDER BY rand LIMIT 3"
+      statement: """
+        MATCH (this)-[:HAS_MEANING]->(m:Meaning)
+        WITH m, rand() AS rand
+        RETURN m
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedMeanings: [Meaning]
+    @cypher(
+      statement: """
+        MATCH (this)-[:SIMILAR]-(:Kanji)-[:HAS_MEANING]->(m:Meaning)
+        WHERE NOT (this)-[:HAS_MEANING]->(m)
+        WITH DISTINCT m, rand() AS rand
+        RETURN m
+        ORDER BY rand
+      """
+    )
+
+    randomConnectedReadings: [Reading]
+    @cypher(
+      statement: """
+        MATCH (this)-[:HAS_READING]->(r:Reading)
+        WITH r, rand() AS rand
+        RETURN r
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedReadings: [Reading]
+    @cypher(
+      statement: """
+        MATCH (this)-[:SIMILAR]-(:Kanji)-[:HAS_READING]->(r:Reading)
+        WHERE NOT (this)-[:HAS_READING]->(r)
+        WITH DISTINCT r, rand() AS rand
+        RETURN r
+        ORDER BY rand
+      """
     )
 }
 
 type Reading {
   id: ID!
   value: String
+
+  randomConnectedKanjis: [Kanji]
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_READING]-(k:Kanji)
+        WITH k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedKanjis: [Kanji]
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_READING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
+        WHERE NOT (this)<-[:HAS_READNING]->(k)
+        WITH DISTINCT k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+      """
+    )
 }
 
 type Meaning {
   id: ID!
   value: String
+
+  randomConnectedKanjis: [Kanji]
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_MEANING]-(k:Kanji)
+        WITH k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+      """
+    )
+
+  randomNotConnectedKanjis: [Kanji]
+    @cypher(
+      statement: """
+        MATCH (this)<-[:HAS_MEANING]-(:Kanji)-[:SIMILAR]-(k:Kanji)
+        WHERE NOT (this)<-[:HAS_MEANING]->(k)
+        WITH DISTINCT k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+      """
+    )
 }
 
 type User {
@@ -25,51 +104,38 @@ type User {
   name: String!
 }
 
-# type User {
-#   id: ID!
-#   name: String
-#   friends: [User] @relation(name: "FRIENDS", direction: "BOTH")
-#   reviews: [Review] @relation(name: "WROTE", direction: "OUT")
-#   avgStars: Float
-#     @cypher(
-#       statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN toFloat(avg(r.stars))"
-#     )
-#   numReviews: Int
-#     @cypher(statement: "MATCH (this)-[:WROTE]->(r:Review) RETURN COUNT(r)")
-# }
-
-# type Business {
-#   id: ID!
-#   name: String
-#   address: String
-#   city: String
-#   state: String
-#   reviews: [Review] @relation(name: "REVIEWS", direction: "IN")
-#   categories: [Category] @relation(name: "IN_CATEGORY", direction: "OUT")
-# }
-
-# type Review {
-#   id: ID!
-#   stars: Int
-#   text: String
-#   date: Date
-#   business: Business @relation(name: "REVIEWS", direction: "OUT")
-#   user: User @relation(name: "WROTE", direction: "IN")
-# }
-
-# type Category {
-#   name: ID!
-#   businesses: [Business] @relation(name: "IN_CATEGORY", direction: "IN")
-# }
 
 type Query {
-  # usersBySubstring(substring: String): [User]
-  #   @cypher(
-  #     statement: "MATCH (u:User) WHERE u.name CONTAINS $substring RETURN u"
-  #   )
-
   randomKanji(level: String): Kanji
     @cypher(
-      statement: "MATCH (k:Kanji)-[:HAS_LEVEL]->(:Level {value: $level}) WITH k, rand() AS rand RETURN k ORDER BY rand LIMIT 1"
+      statement: """
+        MATCH (k:Kanji)-[:HAS_LEVEL]->(:Level {value: $level})
+        WITH k, rand() AS rand
+        RETURN k
+        ORDER BY rand
+        LIMIT 1
+      """
+    )
+
+  randomMeaning(level: String): Meaning
+    @cypher(
+      statement: """
+        MATCH (m:Meaning)<-[:HAS_MEANING]-(:Kanji)-[:HAS_LEVEL]->(:Level {value: $level})
+        WITH m, rand() AS rand
+        RETURN m
+        ORDER BY rand
+        LIMIT 1
+      """
+    )
+
+  randomReading(level: String): Reading
+    @cypher(
+      statement: """
+        MATCH (r:Reading)<-[:HAS_READING]-(:Kanji)-[:HAS_LEVEL]->(:Level {value: $level})
+        WITH r, rand() AS rand
+        RETURN r
+        ORDER BY rand
+        LIMIT 1
+      """
     )
 }

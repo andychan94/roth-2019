@@ -1,6 +1,13 @@
-## Import the data
+## Setup
 
-Import the Words from [https://tangorin.com/vocabulary](https://tangorin.com/vocabulary).
+1. Import the kanjis data
+2. Import the radical data
+3. Run PageRank algorithm to compute kanjis score
+4. Run Jaccard algorithm to compute kanjis similarity
+
+### Import the Kanjis data
+
+Import the data from [https://tangorin.com/vocabulary](https://tangorin.com/vocabulary).
 
 ```
 UNWIND ["5", "4", "3", "2", "1"] AS level
@@ -25,6 +32,8 @@ WITH row, k, m
 MERGE (k)-[:HAS_MEANING]->(m)
 ```
 
+### Import the radical data
+
 Import the radical data from Rikaichan.
 
 ```
@@ -38,7 +47,7 @@ MERGE (k)-[:HAS_RADICAL]->(r)
 RETURN k, r
 ```
 
-Manually create the radicals for the Kanjis which don't have.
+Manually create the radicals for the Kanjis which don't have any.
 
 ```
 MATCH (k:Kanji)
@@ -48,11 +57,72 @@ MERGE (k)-[:HAS_RADICAL]->(r)
 RETURN r
 ```
 
-## ALgos
+### Run PageRank algorithm to compute kanjis score
 
-### Jaccard
+First, we need to create SIMILAR relationships using Jaccard algorithm.
 
-Sample similarity (will not update the DB)
+```
+MATCH (k:Kanji)-[]->(n)
+WITH {item: id(k), categories: collect(id(n))} AS userData
+WITH collect(userData) AS data
+CALL algo.similarity.jaccard(data, {topK: 50, similarityCutoff: 0.1, write:true, writeProperty: "jaccardSimilarity"})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty
+```
+
+Then, we run the PageRank algorithm.
+
+```
+CALL algo.pageRank('Kanji', 'SIMILAR', {iterations:20, dampingFactor:0.85, weightProperty: "jaccardSimilarity"})
+YIELD nodes, iterations, loadMillis, computeMillis, writeMillis, dampingFactor, write, writeProperty
+RETURN nodes, iterations, loadMillis, computeMillis, writeMillis, dampingFactor, write, writeProperty
+```
+
+We update the pagerank score to be funnier.
+
+```
+MATCH (k:Kanji)
+SET k.pagerank = round(k.pagerank * 100)
+```
+
+Finally, we clea the SIMILAR relationships.
+
+```
+MATCH ()-[r:SIMILAR]->() DELETE r
+```
+
+### Run Jaccard algorithm to compute kanjis similarity
+
+```
+MATCH (k:Kanji)-[]->(n)
+WITH {item: id(k), categories: collect(id(n))} AS userData
+WITH collect(userData) AS data
+CALL algo.similarity.jaccard(data, {topK: 3, similarityCutoff: 0.1, write:true, writeProperty: "jaccardSimilarity"})
+YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty
+RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty
+```
+
+## Users queries
+
+Fetch users scoreboard.
+
+```
+MATCH (u:User) 
+RETURN u.name AS name, u.score AS score
+ORDER BY score DESC
+```
+
+Delete users
+
+```
+MATCH (u:User) 
+DETACH DELETE u
+```
+
+
+## Other queries
+
+### Sample similarity from one kanji (this will not update the DB)
 
 ```
 MATCH (k:Kanji {value: "家"})-[]->(n)
@@ -67,28 +137,6 @@ ORDER BY similarity DESC
 LIMIT 10
 ```
 
-Run the Jaccard algorithm (will udpate the DB)
-
-```
-MATCH (k:Kanji)-[]->(n)
-WITH {item: id(k), categories: collect(id(n))} AS userData
-WITH collect(userData) AS data
-CALL algo.similarity.jaccard(data, {topK: 3, similarityCutoff: 0.1, write:true, writeProperty: "jaccardSimilarity"})
-YIELD nodes, similarityPairs, write, writeRelationshipType, writeProperty
-RETURN nodes, similarityPairs, write, writeRelationshipType, writeProperty
-```
-
-
-### PageRank
-
-```
-CALL algo.pageRank(
-  "MATCH (k:Kanji) RETURN id(k) AS id",
-  "MATCH (k1:Kanji)-[:HAS_READING]->()<-[:HAS_READING]-(k2:Kanji) RETURN id(k1) AS source, id(k2) AS target",
-  {graph: "cypher", iterations: 5, write: true}
-)
-```
-
 ### Common Neighbors
 
 ```
@@ -99,4 +147,4 @@ ORDER BY score DESC
 LIMIT 10
 ```
 
-Cannot write property in the graph using this algorithm.
+
