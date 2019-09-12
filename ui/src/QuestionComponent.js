@@ -61,7 +61,7 @@ const QUESTIONS_TYPES = [
 export default class QuestionComponent extends Component {
   constructor(props) {
     super(props);
-    
+    this._isMounted = false;
     this.state = {
       isAnswered: false,
       choices: [],
@@ -70,6 +70,12 @@ export default class QuestionComponent extends Component {
       label: null,
       question: null,
     }
+  }
+  componentDidMount() {
+    this._isMounted = true;
+  }
+  componentWillUnmount() {
+    this._isMounted = false;
   }
   
   chooseRandomQuestion() {
@@ -114,8 +120,7 @@ export default class QuestionComponent extends Component {
       0,
       [data.question.correctOptions[0].value, true]
     );
-    
-    this.setState({
+    this._isMounted && this.setState({
       isAnswered: false,
       label: question.label,
       question: data.question.value,
