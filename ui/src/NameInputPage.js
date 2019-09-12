@@ -3,6 +3,7 @@ import "./App.css";
 import {Button, Col, Container, Form, Row} from "react-bootstrap";
 import gql from "graphql-tag";
 import {compose, graphql} from "react-apollo";
+import Header from "./Header"
 
 const REGISTER_USER = gql`
   mutation User($userName: String!, $userScore: Int) {
@@ -24,11 +25,11 @@ class NameInputPage extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
-
+  
   handleChange(event) {
     this.setState({userName: event.target.value});
   }
-
+  
   async regUser(name) {
     const {CreateUser} = this.props;
     const result = await CreateUser({
@@ -41,7 +42,7 @@ class NameInputPage extends Component {
     this.setState({userScore: result.data.CreateUser.score});
     this.handleClick();
   }
-
+  
   handleClick() {
     this.props.history.push({
       pathname: "/quiz",
@@ -52,13 +53,11 @@ class NameInputPage extends Component {
       }
     });
   }
-
+  
   render() {
     return (
       <>
-        <h1 className="text-light font-weight-bold align-middle logo-line text-center mb-5">
-          &#x1F344; Fun<span className="kanji">字</span>
-        </h1>
+        <Header/>
         <Container>
           <Row className="align-items-center justify-content-center">
             <Col md={6} className="text-center">
@@ -73,10 +72,9 @@ class NameInputPage extends Component {
                 variant="danger"
                 type="button"
                 onClick={this.regUser.bind(this, this.state.userName)}
-                onTouch={this.regUser.bind(this, this.state.userName)}
                 disabled={this.state.userName === ""}
               >
-                Start!
+                Next!
               </Button>
             </Col>
           </Row>
