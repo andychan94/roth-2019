@@ -38,6 +38,7 @@ class NameInputPage extends Component {
         userScore: 0
       }
     });
+    /** @namespace result.data.CreateUser */
     this.setState({userId: result.data.CreateUser.id});
     this.setState({userScore: result.data.CreateUser.score});
     this.handleClick();

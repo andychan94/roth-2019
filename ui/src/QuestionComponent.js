@@ -91,10 +91,10 @@ export default class QuestionComponent extends Component {
     
     let isCorrectAnswer = this.state.choices[choice][1];
     
-    this.props.updateScore(isCorrectAnswer, this.state.score, client);
+    this.props.updateScore(isCorrectAnswer, this.state.score, client).then();
     
     setTimeout(() => {
-      this.query(client)
+      this.query(client).then()
     }, 1000)
   }
   
@@ -112,12 +112,14 @@ export default class QuestionComponent extends Component {
     }
     
     let choices = []
+    /** @namespace data.question.wrongOptions[] */
     choices.push([data.question.wrongOptions[0].value, false]);
     choices.push([data.question.wrongOptions[1].value, false]);
     choices.push([data.question.wrongOptions[2].value, false]);
     choices.splice(
       Math.floor(Math.random() * 4),
       0,
+      /** @namespace data.question.correctOptions[] */
       [data.question.correctOptions[0].value, true]
     );
     this._isMounted && this.setState({
