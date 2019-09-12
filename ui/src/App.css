@@ -45,3 +45,6 @@
 .btn {
   cursor: pointer !important;
 }
+.progress {
+  background-color: #323232;
+}

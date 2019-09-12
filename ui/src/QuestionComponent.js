@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import gql from "graphql-tag";
 import {ApolloConsumer} from "react-apollo";
-import {Button} from "react-bootstrap";
+import {Button, ProgressBar} from "react-bootstrap";
 
 const QUESTIONS_TYPES = [
   {
@@ -71,9 +71,11 @@ export default class QuestionComponent extends Component {
       question: null,
     }
   }
+  
   componentDidMount() {
     this._isMounted = true;
   }
+  
   componentWillUnmount() {
     this._isMounted = false;
   }
@@ -138,30 +140,38 @@ export default class QuestionComponent extends Component {
           {client => (
             <Button block
                     variant="danger"
-                    className="btn-lg"
+                    className="btn-lg mt-2"
                     onClick={this.query.bind(this, client)}>Start the quiz!</Button>
           )}
         </ApolloConsumer>
       )
     } else {
+      const progressMultiplier = 100 / this.props.questionsTotal
+      const now = this.props.questionsCount * progressMultiplier
       return (
         <ApolloConsumer>
           {client => (
-            <div>
-              <div className="text-center">
-                <h5 className="text-light">{this.state.label}</h5>
-                <h1 className="kanji">{this.state.question}</h1>
+            <>
+              <ProgressBar animated now={now}
+                           label={this.props.questionsCount > 0 ? this.props.questionsCount + " / " + this.props.questionsTotal : null}
+                           variant="info"
+              />
+              <div className="mt-3">
+                <div className="text-center">
+                  <h5 className="text-light">{this.state.label}</h5>
+                  <h1 className="kanji">{this.state.question}</h1>
+                </div>
+                
+                {this.state.choices.map((choice, i) => (
+                  <Button key={i} block
+                          variant={this.state.isAnswered ? (choice[1] ? "success" : "danger") : "info"}
+                          className="funji-answer mb-4 btn-lg"
+                          onClick={this.handleClick.bind(this, i, client)}>
+                    {choice[0]}
+                  </Button>
+                ))}
               </div>
-              
-              {this.state.choices.map((choice, i) => (
-                <Button key={i} block
-                        variant={this.state.isAnswered ? (choice[1] ? "success" : "danger") : "info"}
-                        className="funji-answer mb-4 btn-lg"
-                        onClick={this.handleClick.bind(this, i, client)}>
-                  {choice[0]}
-                </Button>
-              ))}
-            </div>
+            </>
           )}
         </ApolloConsumer>
       )

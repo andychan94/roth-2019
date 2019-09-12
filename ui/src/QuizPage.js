@@ -5,6 +5,8 @@ import QuestionComponent from "./QuestionComponent";
 import {Redirect} from "react-router-dom"
 import Header from "./Header"
 
+const QUESTIONS_TOTAL = 20;
+
 class QuizPage extends Component {
   constructor(props) {
     super(props);
@@ -56,14 +58,15 @@ class QuizPage extends Component {
   
   render() {
     if (!this.props.location.state) {
-      return (<Redirect to={"/"}/>)
+      return <Redirect to={"/"}/>
     }
-    if (this.state.questionsCount === 20) {
+    if (this.state.questionsCount === QUESTIONS_TOTAL) {
       return (
         <>
           <Header/>
           <h5 className="text-center mb-3">
-            Hey <strong>{this.props.location.state.userName}</strong>, you got <strong>{this.state.score}</strong> points!
+            Hey <strong>{this.props.location.state.userName}</strong>, you
+            got <strong>{this.state.score}</strong> points!
           </h5>
           <p className="text-center">You should try to take the <strong>JLPT {this.state.currentLevel}</strong>!!</p>
         </>
@@ -73,15 +76,16 @@ class QuizPage extends Component {
         <>
           <Header/>
           <Container>
-            <h5 className="text-center mb-5">
+            <h5 className="text-center mb-3">
               {this.props.location.state.userName}: {this.state.score} points
             </h5>
-            
             <Row className="align-items-center justify-content-center">
               <Col md={6}>
                 <QuestionComponent
                   updateScore={this.updateScore}
                   level={this.state.currentLevel}
+                  questionsTotal={QUESTIONS_TOTAL}
+                  questionsCount={this.state.questionsCount}
                 />
               </Col>
             </Row>
