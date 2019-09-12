@@ -4,6 +4,7 @@ import {Col, Container, Row} from "react-bootstrap";
 import QuestionComponent from "./QuestionComponent";
 import {Redirect} from "react-router-dom"
 import Header from "./Header"
+import gql from "graphql-tag"
 
 const QUESTIONS_TOTAL = 20;
 
@@ -33,6 +34,21 @@ class QuizPage extends Component {
       newStreak = 0
       newLevel = this.changeLevel(newLevel, -1)
     }
+    let userId = this.props.location.state.userId
+  
+    await client.mutate({
+      mutation: gql`
+                mutation User($userId: ID!, $userScore: Int) {
+                  UpdateUser(id: $userId, score: $userScore) {
+                    score
+                  }
+                }
+                `,
+      variables: {
+        userId: userId,
+        userScore: newScore
+      }
+    })
     console.log("updateScore", newScore, newStreak, newLevel)
     this.setState({
       score: newScore,
